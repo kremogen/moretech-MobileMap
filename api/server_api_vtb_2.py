@@ -53,9 +53,20 @@ async def process_data(data: RequestData):
             points_nearby.append(bankomat)
             len_points_nearby.append(ans)
 
-        
+        min_len = float('inf')
+        max_len = 0
+        for point in points_nearby:
+            min_len = min(min_len, point['lenth'])
+            max_len = max(max_len, point['lenth'])
+        midele = int((min_len + max_len))//2
 
-    return points_nearby
+        ans = []
+        for point in points_nearby:
+            if midele > point['lenth']:
+                ans.append(point)
+
+
+    return ans
 
 @app.post("/get_office_location")
 async def process_data(data: RequestData):
@@ -98,8 +109,22 @@ async def process_data(data: RequestData):
                 st = "red"
             point['loadingQueue'][el] = [(cel+ost)*10, st]
 
-    return points_nearby
-    #loadingQueue credit card mortgage payments
+        min_len = float('inf')
+        max_len = 0
+        
+        for point in points_nearby:
+            min_len = min(min_len, point['lenth'])
+            max_len = max(max_len, point['lenth'])
+        midele = int((min_len + max_len)) // 2
+
+        ans = []
+        for point in points_nearby:
+            if midele > point['lenth']:
+                ans.append(point)
+
+    return ans
+
+
 def haversine(lat_p, lon_p, lat_vtb, lon_vtb):
     # Радиус Земли в километрах
     R = 6371.0
