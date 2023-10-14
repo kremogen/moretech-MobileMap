@@ -8,7 +8,7 @@ class MyApiService {
     private val client = OkHttpClient()
 
     suspend fun getAtmData(): List<AtmItem> {
-        val url = "http://192.168.1.4:8000/get_atm" // Замените на ваш URL
+        val url = "http://127.0.0.1:8000/get_atm" // Замените на ваш URL
 
         val request = Request.Builder()
             .url(url)
