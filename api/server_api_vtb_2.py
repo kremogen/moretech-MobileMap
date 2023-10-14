@@ -1,10 +1,16 @@
+import os
 import random
 
+import qrcode
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.responses import FileResponse
+
 from config import bankomats, offices
 import math
+from io import BytesIO
+
 
 app = FastAPI()
 origins = [
@@ -111,7 +117,7 @@ async def process_data(data: RequestData):
 
         min_len = float('inf')
         max_len = 0
-        
+
         for point in points_nearby:
             min_len = min(min_len, point['lenth'])
             max_len = max(max_len, point['lenth'])
@@ -124,6 +130,30 @@ async def process_data(data: RequestData):
 
     return ans
 
+
+@app.get("/get_q_code")
+async def process_data():
+    data = "Информация о клиенте и о банке где взял талон"
+    qr = qrcode.make(data)
+
+    # Сохраняем QR-код в байты
+    img_byte_array = BytesIO()
+    qr.save(img_byte_array, format="PNG")
+    img_byte_array.seek(0)
+
+    # Удаляем файл (если он существует)
+    file_path = "q-code/some_file.png"
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    # Генерируем имя файла (название QR-кода)
+    q_code_name = f"O-{random.randint(0, 50)}.png"
+
+    # Сохраняем изображение как файл
+    with open(file_path, "wb") as file:
+        file.write(img_byte_array.read())
+
+    return FileResponse(file_path, media_type="image/png", headers={"Content-Disposition": f'attachment; filename="{q_code_name}"'})
 
 def haversine(lat_p, lon_p, lat_vtb, lon_vtb):
     # Радиус Земли в километрах
