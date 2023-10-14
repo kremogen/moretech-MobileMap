@@ -28,7 +28,7 @@ class Activity : AppCompatActivity() {
     private lateinit var dialog: DialogModel
 
 
-    private val placemarkTapListener = MapObjectTapListener { mapObject, point ->
+    private val atmTapListener = MapObjectTapListener { mapObject, point ->
         val atmItem = mapObject.userData as AtmItem
         val address = atmItem.address
         showToast("Адресс: ${address}")
@@ -63,28 +63,32 @@ class Activity : AppCompatActivity() {
         map.move(POSITION)
 
         val imageProviderOffice = ImageProvider.fromResource(this, R.drawable.points)
+        val imageProviderAtm = ImageProvider.fromResource(this, CommonDrawables.ic_dollar_pin)
 
-//        runBlocking {
-//            val apiService = MyApiService()
-//            launch(Dispatchers.IO) {
-//                // Запускаем сетевой запрос в фоновом потоке
-//                val atmItems = apiService.getAtmData()
-//                runOnUiThread {
-//                    atmItems.forEach { atmItem ->
-//                        val point = Point(atmItem.latitude, atmItem.longitude)
-//                        val placemarkObject = map.mapObjects.addPlacemark(
-//                            point,
-//                            imageProvider,
-//                            IconStyle().apply { scale = 1f }
-//                        ).apply {
-//                            addTapListener(placemarkTapListener)
-//                            userData = atmItem
-//                        }
-//                    }
-//                }
-//            }
-//        }
 
+        // ATMS
+        runBlocking {
+            val apiService = MyApiService()
+            launch(Dispatchers.IO) {
+                // Запускаем сетевой запрос в фоновом потоке
+                val atmItems = apiService.getAtmData()
+                runOnUiThread {
+                    atmItems.forEach { atmItem ->
+                        val point = Point(atmItem.latitude, atmItem.longitude)
+                        map.mapObjects.addPlacemark(
+                            point,
+                            imageProviderAtm,
+                            IconStyle().apply { scale = 1f }
+                        ).apply {
+                            addTapListener(atmTapListener)
+                            userData = atmItem
+                        }
+                    }
+                }
+            }
+        }
+
+        // OFFICES
         runBlocking {
             val apiService = MyApiService()
             launch(Dispatchers.IO) {
@@ -93,7 +97,7 @@ class Activity : AppCompatActivity() {
                 runOnUiThread {
                     officeItems.forEach { officeItem ->
                         val point = Point(officeItem.latitude, officeItem.longitude)
-                        val placemarkObject = map.mapObjects.addPlacemark(
+                        map.mapObjects.addPlacemark(
                             point,
                             imageProviderOffice,
                             IconStyle().apply { scale = 0.1f }
@@ -122,7 +126,7 @@ class Activity : AppCompatActivity() {
 
 
     companion object {
-        private val POINT = Point(55.751280, 37.629720)
+        private val POINT = Point(55.7131, 37.84473)
         private val POSITION = CameraPosition(POINT, 17.0f, 150.0f, 30.0f)
     }
 }
