@@ -28,16 +28,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.get("/get_atm")
-async def process_data():
-
-    return bankomats[:10]
-
-
 class RequestData(BaseModel):
     latitude: float
     longitude: float
+
 @app.post("/get_atm_location")
 async def process_data(data: RequestData):
     latitude_people = data.latitude
@@ -70,9 +64,8 @@ async def process_data(data: RequestData):
         for point in points_nearby:
             if midele > point['lenth']:
                 ans.append(point)
-
-
     return ans
+
 
 @app.post("/get_office_location")
 async def process_data(data: RequestData):
@@ -97,23 +90,22 @@ async def process_data(data: RequestData):
             len_points_nearby.append(ans)
 
     for point in points_nearby:
-        if 'loadingQueue' not in point:
-            point['loadingQueue'] = {}
 
-        for el in ['credit', 'card', 'mortgage', 'payments']:
-            k, o = random.randint(5, 15), random.randint(0, 50)
-            cel = (o // k)
-            ost = 0 if o%k == 0 else 1
+        point['loadingQueue'] = {}
 
-            if k * 1.5 >= o:
-                st = "green"
-            elif k * 2.5 >= o:
-                st = "yellow"
-            elif k * 3.5 >= o:
-                st = "orange"
-            else:
-                st = "red"
-            point['loadingQueue'][el] = [(cel+ost)*10, st]
+        k, o = random.randint(5, 15), random.randint(0, 50)
+        cel = (o // k)
+        ost = 0 if o%k == 0 else 1
+
+        if k * 1.5 >= o:
+            st = "green"
+        elif k * 2.5 >= o:
+            st = "yellow"
+        elif k * 3.5 >= o:
+            st = "orange"
+        else:
+            st = "red"
+        point['loadingQueue'] = [(cel+ost)*10, st]
 
         min_len = float('inf')
         max_len = 0
@@ -154,6 +146,37 @@ async def process_data():
         file.write(img_byte_array.read())
 
     return FileResponse(file_path, media_type="image/png", headers={"Content-Disposition": f'attachment; filename="{q_code_name}"'})
+
+
+class RequestDataTime(BaseModel):
+    lat_p: float
+    lon_p: float
+    lat_vtb: float
+    lon_vtb: float
+    type_of_movement: int # 0 пешком,  1 авто
+
+@app.post("/get_time")
+async def process_data(data: RequestDataTime):
+    lat_p = data.lat_p
+    lon_p = data.lon_p
+    lat_vtb = data.lat_vtb
+    lon_vtb = data.lon_vtb
+    type_of_movement = data.type_of_movement
+
+    if type_of_movement:
+        speed = 40
+    else:
+        speed = 6
+
+    km_len = haversine(lat_p, lon_p, lat_vtb, lon_vtb)
+
+    return calculate_travel_time(km_len, speed)
+
+
+def calculate_travel_time(km_len, speed):
+    hours = int(km_len / speed)
+    minutes = int((km_len / speed - hours) * 60)
+    return f"{hours} ч. {minutes:02d} мин."
 
 def haversine(lat_p, lon_p, lat_vtb, lon_vtb):
     # Радиус Земли в километрах
