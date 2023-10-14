@@ -5,6 +5,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.yandex.mapkit.MapKit
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.RequestPoint
@@ -80,8 +82,16 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
     private val officeTapListener = MapObjectTapListener { mapObject, point ->
         val officeItem = mapObject.userData as OfficeItem
         val address = officeItem.address
-        showToast("Адресс: ${address}")
-        dialog.showInfoDialogOffice(officeItem)
+        //dialog.showInfoDialogOffice(officeItem)
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_layout, null)
+        val btnClose = view.findViewById<Button>(R.id.idBtnDismiss)
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.setCancelable(false)
+        dialog.setContentView(view)
+        dialog.show()
 
         true
     }
