@@ -44,11 +44,11 @@ async def process_data(data: RequestData):
         if ans < 15.0:
             bankomat['lenth'] = ans
             if len(points_nearby) == 5:
-                for i in range(len(len_points_nearby)):
-                    if len_points_nearby[i] > ans:
-                        len_points_nearby[i] = ans
-                        points_nearby[i] = bankomat
-                        break
+                max_value = max(len_points_nearby)
+                index = len_points_nearby.index(max_value)
+
+                len_points_nearby[index] = ans
+                points_nearby[index] = bankomat
             else:
                 points_nearby.append(bankomat)
                 len_points_nearby.append(ans)
@@ -63,18 +63,18 @@ async def process_data(data: RequestData):
     points_nearby = []
     len_points_nearby = []
 
-    for bankomat in bankomats:
-        ans = haversine(latitude_people, longitude_people, bankomat['latitude'], bankomat['longitude'])
+    for office in offices:
+        ans = haversine(latitude_people, longitude_people, office['latitude'], office['longitude'])
         if ans < 15.0:
-            bankomat['lenth'] = ans
+            office['lenth'] = ans
             if len(points_nearby) == 5:
-                for i in range(len(len_points_nearby)):
-                    if len_points_nearby[i] > ans:
-                        len_points_nearby[i] = ans
-                        points_nearby[i] = bankomat
-                        break
+                max_value = max(len_points_nearby)
+                index = len_points_nearby.index(max_value)
+
+                len_points_nearby[index] = ans
+                points_nearby[index] = office
             else:
-                points_nearby.append(bankomat)
+                points_nearby.append(office)
                 len_points_nearby.append(ans)
 
     for point in points_nearby:
