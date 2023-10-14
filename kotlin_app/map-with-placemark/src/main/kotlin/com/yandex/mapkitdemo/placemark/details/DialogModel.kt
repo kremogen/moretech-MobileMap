@@ -26,6 +26,7 @@ class DialogModel(private val context: Context) {
         builder.setTitle("Информация об Отделении")
         builder.setMessage(
             "Адрес: ${officeItem.address}\n" +
+                    "КОРДЫ: ${officeItem.latitude} ${officeItem.longitude}" +
                     "Режим работы: ${officeItem.openHours}\n" +
                     "Номер телефона: +7912345789\n" +
                     "Метро: ${officeItem.metroStation}"
