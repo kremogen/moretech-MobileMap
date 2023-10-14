@@ -15,6 +15,7 @@ import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkitdemo.common.CommonDrawables
 import com.yandex.mapkitdemo.common.CommonId
 import com.yandex.mapkitdemo.common.showToast
+import com.yandex.mapkitdemo.placemark.details.DialogModel
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,12 +25,24 @@ import java.util.Objects
 class Activity : AppCompatActivity() {
     private lateinit var mapView: MapView
     private lateinit var map: Map
+    private lateinit var dialog: DialogModel
 
 
     private val placemarkTapListener = MapObjectTapListener { mapObject, point ->
         val atmItem = mapObject.userData as AtmItem
         val address = atmItem.address
         showToast("Адресс: ${address}")
+        dialog.showInfoDialogAtm(atmItem)
+
+        true
+    }
+
+    private val officeTapListener = MapObjectTapListener { mapObject, point ->
+        val officeItem = mapObject.userData as OfficeItem
+        val address = officeItem.address
+        showToast("Адресс: ${address}")
+        dialog.showInfoDialogOffice(officeItem)
+
         true
     }
 
@@ -39,6 +52,7 @@ class Activity : AppCompatActivity() {
         MapKitFactory.initialize(this)
         setContentView(R.layout.activity_layout)
         mapView = findViewById(R.id.mapview)
+        dialog = DialogModel(this)
 
         val mapkitVersionView = findViewById<LinearLayout>(R.id.mapkit_version)
         val mapkitVersionTextView =
@@ -48,23 +62,45 @@ class Activity : AppCompatActivity() {
         val map = mapView.mapWindow.map
         map.move(POSITION)
 
-        val imageProvider = ImageProvider.fromResource(this, CommonDrawables.ic_dollar_pin)
+        val imageProviderOffice = ImageProvider.fromResource(this, R.drawable.points)
+
+//        runBlocking {
+//            val apiService = MyApiService()
+//            launch(Dispatchers.IO) {
+//                // Запускаем сетевой запрос в фоновом потоке
+//                val atmItems = apiService.getAtmData()
+//                runOnUiThread {
+//                    atmItems.forEach { atmItem ->
+//                        val point = Point(atmItem.latitude, atmItem.longitude)
+//                        val placemarkObject = map.mapObjects.addPlacemark(
+//                            point,
+//                            imageProvider,
+//                            IconStyle().apply { scale = 1f }
+//                        ).apply {
+//                            addTapListener(placemarkTapListener)
+//                            userData = atmItem
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         runBlocking {
             val apiService = MyApiService()
             launch(Dispatchers.IO) {
                 // Запускаем сетевой запрос в фоновом потоке
-                val atmItems = apiService.getAtmData()
+                val officeItems = apiService.getOfficeData(55.7131, 37.84473)
                 runOnUiThread {
-                    atmItems.forEach { atmItem ->
-                        val point = Point(atmItem.latitude, atmItem.longitude)
+                    officeItems.forEach { officeItem ->
+                        val point = Point(officeItem.latitude, officeItem.longitude)
                         val placemarkObject = map.mapObjects.addPlacemark(
                             point,
-                            imageProvider,
-                            IconStyle().apply { scale = 1f }
+                            imageProviderOffice,
+                            IconStyle().apply { scale = 0.1f }
                         ).apply {
-                            addTapListener(placemarkTapListener)
-                            userData = atmItem}
+                            addTapListener(officeTapListener)
+                            userData = officeItem
+                        }
                     }
                 }
             }
@@ -82,13 +118,6 @@ class Activity : AppCompatActivity() {
         mapView.onStop()
         MapKitFactory.getInstance().onStop()
         super.onStop()
-    }
-
-    private fun createPlacemarkTapListener() = MapObjectTapListener { mapObject, _ ->
-        val atmItem = mapObject.userData as AtmItem
-        val address = atmItem.address
-        showToast("Address: $address")
-        true
     }
 
 

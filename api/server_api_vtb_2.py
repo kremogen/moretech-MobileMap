@@ -7,12 +7,7 @@ from config import bankomats, offices
 import math
 
 app = FastAPI()
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-]
+origins = ['*']
 
 app.add_middleware(
     CORSMiddleware,
@@ -121,4 +116,4 @@ def haversine(lat_p, lon_p, lat_vtb, lon_vtb):
 if __name__ == '__main__':
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="192.168.1.4", port=8000)
