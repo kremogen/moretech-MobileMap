@@ -75,7 +75,21 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
     }
 
     private val lineTapListener = MapObjectTapListener { _, _ ->
-        showToast("ZZZZZZ}")
+        runBlocking {
+            val apiService = MyApiService()
+            val timestr = apiService.getTime(
+                START_POINT.latitude,
+                START_POINT.longitude,
+                END_POINT.latitude,
+                END_POINT.longitude,
+                0
+            )
+            runOnUiThread {
+                showToast("Время в пути $timestr")
+            }
+            Log.d("app", "${START_POINT.latitude} ${START_POINT.longitude}")
+            Log.d("app", "${END_POINT.latitude} ${END_POINT.longitude}")
+        }
         true
     }
 
@@ -236,7 +250,7 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
 
     override fun onDrivingRoutes(p0: MutableList<DrivingRoute>) {
         for (route in p0) {
-            mapObjects!!.addPolyline(route.geometry).apply { addTapListener(lineTapListener)}
+            mapObjects!!.addPolyline(route.geometry).apply { addTapListener(lineTapListener) }
         }
     }
 

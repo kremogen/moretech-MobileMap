@@ -90,6 +90,63 @@ class MyApiService {
         }
     }
 
+    suspend fun getTime(
+        latitudeUser: Double,
+        longitudeUser: Double,
+        latitudeVTB: Double,
+        longitudeVTB: Double,
+        type: Int
+    ): String {
+        val url = link + "/get_time"
+
+        val jsonBody = JSONObject().apply {
+            put("lat_p", latitudeUser)
+            put("lon_p", longitudeUser)
+            put("lat_vtb", latitudeVTB)
+            put("lon_vtb", longitudeVTB)
+            put("type_of_movement", type)
+
+        }
+
+        val requestBody =
+            RequestBody.create(MediaType.parse("application/json"), jsonBody.toString())
+
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+
+        return suspendCoroutine { continuation ->
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    continuation.resumeWith(Result.failure(e))
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (!response.isSuccessful) {
+                            val errorMessage = "Response unsuccessful: ${response.code()}"
+                            continuation.resumeWith(Result.failure(IOException(errorMessage)))
+                        } else {
+                            val jsonData = response.body()?.string()
+                            if (jsonData != null) {
+                                val officeItems = parseTime(jsonData)
+                                continuation.resumeWith(Result.success(jsonData))
+                            } else {
+                                val errorMessage = "Response body is empty"
+                                continuation.resumeWith(Result.failure(IOException(errorMessage)))
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    private fun parseTime(jsonData: String): String {
+        return jsonData
+    }
+
     private fun parseAtmData(jsonData: String): List<AtmItem> {
         val atmItems = mutableListOf<AtmItem>()
 
