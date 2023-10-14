@@ -8,7 +8,8 @@ android {
 
 dependencies {
     // Add MapKit SDK lite dependency
-    implementation "com.yandex.android:maps.mobile:${rootProject.ext.mapkitLiteVersion}"
+    // implementation "com.yandex.android:maps.mobile:${rootProject.ext.mapkitLiteVersion}"
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.yandex.android:maps.mobile:4.4.0-full'
 }

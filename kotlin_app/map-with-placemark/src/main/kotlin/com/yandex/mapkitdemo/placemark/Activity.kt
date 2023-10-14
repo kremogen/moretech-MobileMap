@@ -7,31 +7,46 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.MapKit
 import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.RequestPoint
+import com.yandex.mapkit.RequestPointType
+import com.yandex.mapkit.annotations.AnnotationLanguage
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.layers.ObjectEvent
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.mapkit.directions.DirectionsFactory
+import com.yandex.mapkit.directions.driving.DrivingOptions
+import com.yandex.mapkit.directions.driving.DrivingRoute
+import com.yandex.mapkit.directions.driving.DrivingRouter
+import com.yandex.mapkit.directions.driving.DrivingSession
+import com.yandex.mapkit.directions.driving.DrivingSession.DrivingRouteListener
+import com.yandex.mapkit.directions.driving.VehicleOptions
+import com.yandex.mapkit.directions.driving.VehicleType
 import com.yandex.mapkit.user_location.UserLocationObjectListener
 import com.yandex.mapkit.user_location.UserLocationView
 import com.yandex.mapkitdemo.common.CommonDrawables
 import com.yandex.mapkitdemo.common.CommonId
 import com.yandex.mapkitdemo.common.showToast
 import com.yandex.mapkitdemo.placemark.details.DialogModel
+import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class Activity : AppCompatActivity(), UserLocationObjectListener {
+class Activity : AppCompatActivity(), UserLocationObjectListener,
+    DrivingSession.DrivingRouteListener {
     private lateinit var mapView: MapView
     private lateinit var map: Map
     private lateinit var dialog: DialogModel
@@ -39,14 +54,26 @@ class Activity : AppCompatActivity(), UserLocationObjectListener {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var START_POINT = Point(latitude, longitude)
+    private var END_POINT = Point(latitude, longitude)
+    private var mapObjects: MapObjectCollection? = null
+    private var drivingRouter: DrivingRouter? = null
+    private var drivingSession: DrivingSession? = null
 
 
     private val atmTapListener = MapObjectTapListener { mapObject, point ->
         val atmItem = mapObject.userData as AtmItem
         val address = atmItem.address
+        END_POINT = Point(atmItem.latitude, atmItem.longitude)
         showToast("Адресс: ${address}")
         dialog.showInfoDialogAtm(atmItem)
+        submitRequest()
 
+        true
+    }
+
+    private val lineTapListener = MapObjectTapListener { _, _ ->
+        showToast("ZZZZZZ}")
         true
     }
 
@@ -72,7 +99,7 @@ class Activity : AppCompatActivity(), UserLocationObjectListener {
         fusedLocationProviderClient.lastLocation.addOnSuccessListener {
             latitude = it.latitude
             longitude = it.longitude
-            locationTextView.text = "$latitude\n$longitude"
+            START_POINT = Point(latitude, longitude)
             val POSITION = CameraPosition(Point(latitude, longitude), 13f, 150f, 30f)
             map.move(POSITION)
             val imageProviderOffice = ImageProvider.fromResource(this, R.drawable.points)
@@ -127,7 +154,6 @@ class Activity : AppCompatActivity(), UserLocationObjectListener {
 
         }
         requestLocationPermission()
-        locationTextView = findViewById(R.id.locationTextView)
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -148,6 +174,8 @@ class Activity : AppCompatActivity(), UserLocationObjectListener {
             mapkitVersionView.findViewById<TextView>(CommonId.mapkit_version_value)
         mapkitVersionTextView.text = MapKitFactory.getInstance().version
 
+        drivingRouter = DirectionsFactory.getInstance().createDrivingRouter()
+        mapObjects = mapView.map.mapObjects.addCollection()
 
     }
 
@@ -194,5 +222,27 @@ class Activity : AppCompatActivity(), UserLocationObjectListener {
 
     override fun onObjectUpdated(p0: UserLocationView, p1: ObjectEvent) {
         TODO("Not yet implemented")
+    }
+
+    override fun onDrivingRoutes(p0: MutableList<DrivingRoute>) {
+        for (route in p0) {
+            mapObjects!!.addPolyline(route.geometry).apply { addTapListener(lineTapListener)}
+        }
+    }
+
+    override fun onDrivingRoutesError(p0: Error) {
+        showToast("$p0")
+    }
+
+    private fun submitRequest() {
+        mapObjects?.clear()
+        val drivingOptions = DrivingOptions().setRoutesCount(1)
+        val vehicleOptions = VehicleOptions()
+        val requestPoints: ArrayList<RequestPoint> = ArrayList()
+        requestPoints.add(RequestPoint(START_POINT, RequestPointType.WAYPOINT, null, null))
+        requestPoints.add(RequestPoint(END_POINT, RequestPointType.WAYPOINT, null, null))
+        drivingSession =
+            drivingRouter!!.requestRoutes(requestPoints, drivingOptions, vehicleOptions, this)
+
     }
 }

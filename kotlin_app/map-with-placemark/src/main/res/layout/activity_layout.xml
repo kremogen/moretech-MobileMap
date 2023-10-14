@@ -6,6 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".Activity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#002882"
+        tools:ignore="MissingConstraints">
+        <!-- Логотип -->
+        <ImageView
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:src="@drawable/logo_vtb"
+            android:layout_gravity="start"
+            android:layout_marginStart="16dp" />
+    </androidx.appcompat.widget.Toolbar>
+
+
     <com.yandex.mapkit.mapview.MapView
         android:id="@+id/mapview"
         android:layout_width="match_parent"
@@ -16,16 +32,23 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
+
     <include
         android:id="@+id/mapkit_version"
         layout="@layout/mapkit_version_layout"/>
 
-    <TextView
-        android:id="@+id/locationTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Location will be displayed here"
-        tools:ignore="MissingConstraints" />
-
+    <ImageButton
+        android:id="@+id/circularButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="70dp"
+        android:background="#00AAFF"
+        android:src="@drawable/navigation"
+        tools:ignore="MissingConstraints"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
