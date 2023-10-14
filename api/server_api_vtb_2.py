@@ -1,10 +1,16 @@
+import os
 import random
 
+import qrcode
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.responses import FileResponse
+
 from config import bankomats, offices
 import math
+from io import BytesIO
+
 
 app = FastAPI()
 origins = ['*']
@@ -36,19 +42,32 @@ async def process_data(data: RequestData):
     len_points_nearby = []
     for bankomat in bankomats:
         ans = haversine(latitude_people, longitude_people, bankomat['latitude'], bankomat['longitude'])
-        if ans < 15.0:
-            bankomat['lenth'] = ans
-            if len(points_nearby) == 5:
-                max_value = max(len_points_nearby)
-                index = len_points_nearby.index(max_value)
 
-                len_points_nearby[index] = ans
-                points_nearby[index] = bankomat
-            else:
-                points_nearby.append(bankomat)
-                len_points_nearby.append(ans)
+        bankomat['lenth'] = ans
+        if len(points_nearby) == 5:
+            max_value = max(len_points_nearby)
+            index = len_points_nearby.index(max_value)
 
-    return points_nearby
+            len_points_nearby[index] = ans
+            points_nearby[index] = bankomat
+        else:
+            points_nearby.append(bankomat)
+            len_points_nearby.append(ans)
+
+        min_len = float('inf')
+        max_len = 0
+        for point in points_nearby:
+            min_len = min(min_len, point['lenth'])
+            max_len = max(max_len, point['lenth'])
+        midele = int((min_len + max_len))//2
+
+        ans = []
+        for point in points_nearby:
+            if midele > point['lenth']:
+                ans.append(point)
+
+
+    return ans
 
 @app.post("/get_office_location")
 async def process_data(data: RequestData):
@@ -60,17 +79,17 @@ async def process_data(data: RequestData):
 
     for office in offices:
         ans = haversine(latitude_people, longitude_people, office['latitude'], office['longitude'])
-        if ans < 15.0:
-            office['lenth'] = ans
-            if len(points_nearby) == 5:
-                max_value = max(len_points_nearby)
-                index = len_points_nearby.index(max_value)
 
-                len_points_nearby[index] = ans
-                points_nearby[index] = office
-            else:
-                points_nearby.append(office)
-                len_points_nearby.append(ans)
+        office['lenth'] = ans
+        if len(points_nearby) == 5:
+            max_value = max(len_points_nearby)
+            index = len_points_nearby.index(max_value)
+
+            len_points_nearby[index] = ans
+            points_nearby[index] = office
+        else:
+            points_nearby.append(office)
+            len_points_nearby.append(ans)
 
     for point in points_nearby:
         if 'loadingQueue' not in point:
@@ -91,8 +110,46 @@ async def process_data(data: RequestData):
                 st = "red"
             point['loadingQueue'][el] = [(cel+ost)*10, st]
 
-    return points_nearby
-    #loadingQueue credit card mortgage payments
+        min_len = float('inf')
+        max_len = 0
+
+        for point in points_nearby:
+            min_len = min(min_len, point['lenth'])
+            max_len = max(max_len, point['lenth'])
+        midele = int((min_len + max_len)) // 2
+
+        ans = []
+        for point in points_nearby:
+            if midele > point['lenth']:
+                ans.append(point)
+
+    return ans
+
+
+@app.get("/get_q_code")
+async def process_data():
+    data = "Информация о клиенте и о банке где взял талон"
+    qr = qrcode.make(data)
+
+    # Сохраняем QR-код в байты
+    img_byte_array = BytesIO()
+    qr.save(img_byte_array, format="PNG")
+    img_byte_array.seek(0)
+
+    # Удаляем файл (если он существует)
+    file_path = "q-code/some_file.png"
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    # Генерируем имя файла (название QR-кода)
+    q_code_name = f"O-{random.randint(0, 50)}.png"
+
+    # Сохраняем изображение как файл
+    with open(file_path, "wb") as file:
+        file.write(img_byte_array.read())
+
+    return FileResponse(file_path, media_type="image/png", headers={"Content-Disposition": f'attachment; filename="{q_code_name}"'})
+
 def haversine(lat_p, lon_p, lat_vtb, lon_vtb):
     # Радиус Земли в километрах
     R = 6371.0
@@ -113,6 +170,7 @@ def haversine(lat_p, lon_p, lat_vtb, lon_vtb):
     distance = R * c
 
     return distance
+
 if __name__ == '__main__':
     import uvicorn
 
