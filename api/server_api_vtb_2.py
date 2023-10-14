@@ -41,17 +41,19 @@ async def process_data(data: RequestData):
     len_points_nearby = []
     for bankomat in bankomats:
         ans = haversine(latitude_people, longitude_people, bankomat['latitude'], bankomat['longitude'])
-        if ans < 15.0:
-            bankomat['lenth'] = ans
-            if len(points_nearby) == 5:
-                max_value = max(len_points_nearby)
-                index = len_points_nearby.index(max_value)
 
-                len_points_nearby[index] = ans
-                points_nearby[index] = bankomat
-            else:
-                points_nearby.append(bankomat)
-                len_points_nearby.append(ans)
+        bankomat['lenth'] = ans
+        if len(points_nearby) == 5:
+            max_value = max(len_points_nearby)
+            index = len_points_nearby.index(max_value)
+
+            len_points_nearby[index] = ans
+            points_nearby[index] = bankomat
+        else:
+            points_nearby.append(bankomat)
+            len_points_nearby.append(ans)
+
+        
 
     return points_nearby
 
@@ -65,17 +67,17 @@ async def process_data(data: RequestData):
 
     for office in offices:
         ans = haversine(latitude_people, longitude_people, office['latitude'], office['longitude'])
-        if ans < 15.0:
-            office['lenth'] = ans
-            if len(points_nearby) == 5:
-                max_value = max(len_points_nearby)
-                index = len_points_nearby.index(max_value)
 
-                len_points_nearby[index] = ans
-                points_nearby[index] = office
-            else:
-                points_nearby.append(office)
-                len_points_nearby.append(ans)
+        office['lenth'] = ans
+        if len(points_nearby) == 5:
+            max_value = max(len_points_nearby)
+            index = len_points_nearby.index(max_value)
+
+            len_points_nearby[index] = ans
+            points_nearby[index] = office
+        else:
+            points_nearby.append(office)
+            len_points_nearby.append(ans)
 
     for point in points_nearby:
         if 'loadingQueue' not in point:
@@ -118,6 +120,7 @@ def haversine(lat_p, lon_p, lat_vtb, lon_vtb):
     distance = R * c
 
     return distance
+
 if __name__ == '__main__':
     import uvicorn
 
