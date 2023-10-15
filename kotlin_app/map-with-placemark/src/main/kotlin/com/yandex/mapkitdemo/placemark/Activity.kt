@@ -53,7 +53,6 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
     private lateinit var mapView: MapView
     private lateinit var map: Map
     private lateinit var dialog: DialogModel
-    private lateinit var locationTextView: TextView
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -68,9 +67,16 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
         val atmItem = mapObject.userData as AtmItem
         val address = atmItem.address
         END_POINT = Point(atmItem.latitude, atmItem.longitude)
-        showToast("Адресс: ${address}")
-        dialog.showInfoDialogAtm(atmItem)
         submitRequest()
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.atm_bottom_sheet_layout, null)
+        val btnClose = view.findViewById<Button>(R.id.idBtnDismiss)
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.setCancelable(false)
+        dialog.setContentView(view)
+        dialog.show()
 
         true
     }
@@ -107,6 +113,8 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
         dialog.setCancelable(false)
         dialog.setContentView(view)
         dialog.show()
+        END_POINT = Point(point.latitude, point.longitude)
+        submitRequest()
 
         true
     }
@@ -125,6 +133,18 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
             val POSITION = CameraPosition(Point(latitude, longitude), 13f, 150f, 30f)
             map.move(POSITION)
         }
+        val wayButton: Button = findViewById(R.id.wayButton)
+        wayButton.setOnClickListener {
+            val dialog = BottomSheetDialog(this)
+            val view = layoutInflater.inflate(R.layout.settings_bottom_sheet_layout, null)
+            val btnClose: Button = view.findViewById(R.id.backButton)
+            btnClose.setOnClickListener {
+                dialog.dismiss()
+            }
+            dialog.setCancelable(false)
+            dialog.setContentView(view)
+            dialog.show()
+        }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationProviderClient.lastLocation.addOnSuccessListener {
             latitude = it.latitude
@@ -133,7 +153,7 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
             val POSITION = CameraPosition(Point(latitude, longitude), 13f, 150f, 30f)
             map.move(POSITION)
             val imageProviderOffice = ImageProvider.fromResource(this, R.drawable.points)
-            val imageProviderAtm = ImageProvider.fromResource(this, CommonDrawables.ic_dollar_pin)
+            val imageProviderAtm = ImageProvider.fromResource(this, R.drawable.rub)
 
             // ATMS
             runBlocking {

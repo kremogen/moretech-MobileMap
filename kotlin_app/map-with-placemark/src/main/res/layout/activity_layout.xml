@@ -14,7 +14,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -35,10 +35,9 @@
     </com.yandex.mapkit.mapview.MapView>
 
 
-
     <include
         android:id="@+id/mapkit_version"
-        layout="@layout/mapkit_version_layout"/>
+        layout="@layout/mapkit_version_layout" />
 
     <ImageButton
         android:id="@+id/circularButton"
@@ -50,8 +49,22 @@
         android:layout_marginBottom="70dp"
         android:background="#00AAFF"
         android:src="@drawable/navigation"
-        tools:ignore="MissingConstraints"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/wayButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="70dp"
+        android:background="#00AAFF"
+        android:text="Way"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
