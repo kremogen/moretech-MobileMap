@@ -74,6 +74,7 @@ $ python3 server_api.py
 2. Сбор ID мест с помощью API Мест яндекс карт для анализа через парсер - [Collect](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/review_collect.ipynb)
 3. Аналита отзывов - [Review Analysis](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/review_analysis.ipynb) (предобработка, применения алгоритмов, анализ ключевых слов, сентимента)
 4. Финальный pipeline для анализа ключевых тегов в отзывах для каждого отделения - [Tag Collection](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/tag_collection.ipynb)
+5. Собранные теги отделений - [tag_collection.json](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/tag_collection_word2vec.json)
    
 #### Идея для улучшения
 
@@ -88,13 +89,6 @@ _Получаем теги, а так-же их температуру в про
 <img src="docs/data.png" width="500">
 
 [Пример реализации](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/tag_collection.json)
-
-#### Кластеризация
-
-Кластеризация может помочь разделять отзывы на группы в зависимости от уровня удовлетворенности клиентов. Это может
-помочь банку быстро выявить общие проблемы и радости клиентов.
-Выделение ключевых слов: Анализ ключевых слов может помочь выявить, какие конкретные аспекты обслуживания вызывают
-положительные или отрицательные эмоции.
 
 #### Поиск точек
 
