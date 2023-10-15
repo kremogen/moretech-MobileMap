@@ -14,12 +14,7 @@ lat_r = 0.01585
 lon_r = 0.01125
 
 app = FastAPI()
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-]
+origins = ['*']
 
 app.add_middleware(
     CORSMiddleware,
