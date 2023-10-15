@@ -35,10 +35,14 @@ $ python3 server_api.py
 
 ## 📌 Примеры работы приложения
 
-<img src="docs/img_1.png" width="300">
-<img src="docs/img_2.png" width="300">
-<img src="docs/img_3.png" width="300">
-<img src="docs/img_4.png" width="300">
+<div>
+  <img src="docs/img_1.png" width="300">
+  <img src="docs/img_2.png" width="300">
+</div>
+<div>
+  <img src="docs/img_3.png" width="300">
+  <img src="docs/img_4.png" width="300">
+</div>
 
 ## 📄 Логика работы
 
