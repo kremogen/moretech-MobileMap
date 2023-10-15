@@ -194,7 +194,12 @@ def haversine(lat_p, lon_p, lat_vtb, lon_vtb):
 
     return distance
 
+@app.get("/get_atm")
+async def process_data():
+
+    return bankomats[:10]
+
 if __name__ == '__main__':
     import uvicorn
 
-    uvicorn.run(app, host="192.168.1.4", port=8000)
+    uvicorn.run(app, host="192.168.1.67", port=8000)

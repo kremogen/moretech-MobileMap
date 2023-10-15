@@ -2,6 +2,7 @@ package com.yandex.mapkitdemo.placemark
 
 import MyApiService
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -61,15 +63,22 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
     private var mapObjects: MapObjectCollection? = null
     private var drivingRouter: DrivingRouter? = null
     private var drivingSession: DrivingSession? = null
+    private lateinit var settingClicker: Button
 
 
     private val atmTapListener = MapObjectTapListener { mapObject, point ->
         val atmItem = mapObject.userData as AtmItem
         val address = atmItem.address
         END_POINT = Point(atmItem.latitude, atmItem.longitude)
-        showToast("Адресс: ${address}")
-        dialog.showInfoDialogAtm(atmItem)
-        submitRequest()
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.atm_bottom_sheet_layout, null)
+        val btnClose = view.findViewById<Button>(R.id.idBtnDismiss)
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.setCancelable(false)
+        dialog.setContentView(view)
+        dialog.show()
 
         true
     }
@@ -113,6 +122,18 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val view = layoutInflater.inflate(R.layout.activity_layout, null)
+        settingClicker = view.findViewById(R.id.settingsButton)
+        settingClicker.setOnClickListener {
+            val dialog = BottomSheetDialog(this)
+            val view = layoutInflater.inflate(R.layout.settings_bottom_sheet_layout, null)
+            val btnClose = view.findViewById<Button>(R.id.idBackButton)
+            btnClose.setOnClickListener {
+                dialog.dismiss()
+            }
+            dialog.setCancelable(false)
+            dialog.setContentView(view)
+            dialog.show() }
         MapKitFactory.initialize(this)
         var mapKit: MapKit = MapKitFactory.getInstance()
         setContentView(R.layout.activity_layout)
@@ -127,7 +148,7 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
             val POSITION = CameraPosition(Point(latitude, longitude), 13f, 150f, 30f)
             map.move(POSITION)
             val imageProviderOffice = ImageProvider.fromResource(this, R.drawable.points)
-            val imageProviderAtm = ImageProvider.fromResource(this, CommonDrawables.ic_dollar_pin)
+            val imageProviderAtm = ImageProvider.fromResource(this, R.drawable.rub)
 
             // ATMS
             runBlocking {

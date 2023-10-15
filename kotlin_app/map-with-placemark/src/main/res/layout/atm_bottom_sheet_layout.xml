@@ -15,7 +15,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_margin="10dp"
-            android:src="@drawable/logo" />
+            android:src="@drawable/rub" />
 
         <!--text view for displaying course name-->
         <TextView
@@ -25,7 +25,7 @@
             android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/idIVCourse"
             android:layout_toRightOf="@id/idIVCourse"
-            android:text="ВТБ Банк"
+            android:text="ВТБ Банкомат"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -39,7 +39,7 @@
             android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/idIVCourse"
             android:layout_toRightOf="@id/idIVCourse"
-            android:text="Тверская ул.8"
+            android:text="Ул. Героев Панфилова, д. 12, корп. 1"
             android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="normal"/>
@@ -52,7 +52,7 @@
             android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/idIVCourse"
             android:layout_toRightOf="@id/idIVCourse"
-            android:text="55.762819, 37.609504"
+            android:text="51.432819, 18.664504"
             android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="normal"/>
@@ -92,42 +92,43 @@
             android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/idIVCourse"
             android:layout_toRightOf="@id/idIVCourse"
-            android:text="пн-пт 10:00 - 20:00 мск"
+            android:text="Работает круглосуточно"
             android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="italic"/>
 
         <TextView
-            android:id="@+id/idQueue"
+            android:id="@+id/idMoney"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/idTime"
             android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/idIVCourse"
             android:layout_toRightOf="@id/idIVCourse"
-            android:text="Загруженность:"
+            android:text="Кол-во наличности:"
             android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="bold"/>
 
-        <ImageView
-            android:id="@+id/idQueueImg"
+        <TextView
+            android:id="@+id/idCash"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/idQueue"
+            android:layout_below="@id/idMoney"
             android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/idIVCourse"
             android:layout_toRightOf="@id/idIVCourse"
+            android:text="До 500.000 руб."
             android:textColor="@color/black"
-            android:src="@drawable/queue"
-            android:layout_marginRight="30dp"/>
+            android:textSize="15sp"
+            android:textStyle="normal"/>
 
         <!--button for dismissing our dialog-->
         <Button
             android:id="@+id/idBtnDismiss"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/idQueueImg"
+            android:layout_below="@id/idCash"
             android:layout_margin="10dp"
             android:text="Встать в очередь"
             android:textAllCaps="false"

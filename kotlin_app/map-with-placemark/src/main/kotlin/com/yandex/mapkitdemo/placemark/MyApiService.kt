@@ -8,7 +8,7 @@ import java.io.IOException
 import kotlin.coroutines.suspendCoroutine
 
 class MyApiService {
-    private val link = "http://192.168.1.4:8000"
+    private val link = "http://192.168.1.67:8000"
     private val client = OkHttpClient()
 
     suspend fun getAtmData(): List<AtmItem> {

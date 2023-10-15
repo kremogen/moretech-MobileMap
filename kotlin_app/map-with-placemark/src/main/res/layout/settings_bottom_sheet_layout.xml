@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:padding="5dp">
+
+        <Button
+            android:id="@+id/idBackButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:background="#ffffff"
+            android:src="@drawable/logo_vtb"/>
+        <!--image view for displaying course image-->
+        <TextView
+            android:id="@+id/idTVCourseName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Как хотите добраться?"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"/>
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/idTVCourseName">
+            <RadioButton android:id="@+id/radio_feet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Пешком"/>
+            <RadioButton android:id="@+id/radio_car"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="На машине"/>
+        </RadioGroup>
+
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
