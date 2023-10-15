@@ -67,40 +67,21 @@ _Получаем теги, а так-же их температуру в про
 ```groovy
 import math
 
-EARTH_RADIUS = 6371210 #
-Радиус Земли
-DISTANCE = 5000 #
-Интересующее нас
-расстояние
+EARTH_RADIUS = 6371210  # Радиус Земли
+DISTANCE = 5000  # Интересующее нас расстояние
 
-def compute_delta(degrees)
+def compute_delta(degrees):
+    return math.pi / 180 * EARTH_RADIUS * math.cos(deg2rad(degrees))
 
-:
-return math.pi / 180 * EARTH_RADIUS * math.cos(deg2rad(degrees))
+def deg2rad(degrees):
+    return degrees * math.pi / 180
 
-def deg2rad(degrees)
+latitude = 55.460531  # Интересующие нас координаты широты
+longitude = 37.210488  # Интересующие нас координаты долготы
 
-:
-return degrees * math.pi / 180
+delta_lat = compute_delta(latitude)  # Получаем дельту по широте
+delta_lon = compute_delta(longitude)  # Дельту по долготе
 
-latitude = 55.460531 #
-Интересующие нас
-координаты широты
-longitude = 37.210488 #
-Интересующие нас
-координаты долготы
-
-delta_lat = compute_delta(latitude) #
-Получаем дельту
-по широте
-delta_lon = compute_delta(longitude) #
-Дельту по
-долготе
-
-around_lat = DISTANCE / delta_lat #
-Вычисляем диапазон
-координат по широте
-around_lon = DISTANCE / delta_lon #
-Вычисляем диапазон
-координат по долготе
+around_lat = DISTANCE / delta_lat  # Вычисляем диапазон координат по широте
+around_lon = DISTANCE / delta_lon  # Вычисляем диапазон координат по долготе
 ```
