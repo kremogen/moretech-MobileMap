@@ -7,6 +7,8 @@
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Jupiter](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)
 
 - Команда _**HyPe Solutions**_
 - Кейс _**Mobile**_
@@ -54,9 +56,11 @@ $ python3 server_api.py
 
 #### Реализация алгоритма подбора тегов
 
-1. Парсинг отзывов конкретной организации (отделение банка) с помощью selenium
+1. Парсинг отзывов конкретной организации (отделение банка) с помощью selenium<br>
+   
 2. Анализ текстов отзывов, который включает в себя:<br>
    2.1 Предобработка текста (лемматизация и выделение только прилагательных и наречий для описания какое отделение)<br>
+   <br>
    2.2 Создание TF-IDF / Word2Vec эмбеддингов (векторное представление) слов на основе предобработанного корпуса<br>
    2.3 Кластеризация слов в отзывах с помощью алгоритма машинного обучения KMeans<br>
    2.4 Определение ключевого слова в кластерах (получения векторов слов с помощью предобученной word2vec модели на
@@ -66,6 +70,14 @@ $ python3 server_api.py
 3. Анализ сентимента отзывов с помощью предобученной модели huggingface rubert-base-cased-sentiment (
    температура настроения в %)<br>
 
+#### Файлы, где находится реализация алгоритмов
+
+1. Парсер - [Parser](https://github.com/kremogen/moretech-MobileMap/tree/main/ds/parser)
+2. Сбор ID мест с помощью API Мест яндекс карт для анализа через парсер - [Collect](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/review_collect.ipynb)
+3. Аналита отзывов - [Review Analysis](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/review_analysis.ipynb) (предобработка, применения алгоритмов, анализ ключевых слов, сентимента)
+4. Финальный pipeline для анализа ключевых тегов в отзывах для каждого отделения - [Tag Collection](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/tag_collection.ipynb)
+5. Собранные теги отделений - [tag_collection.json](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/tag_collection_word2vec.json)
+   
 #### Идея для улучшения
 
 1. Можно извлекать Bigram и Trigram (популярные связки из 2-3 слов в отзывах) для более детального описания отделения
@@ -79,13 +91,6 @@ _Получаем теги, а так-же их температуру в про
 <img src="docs/data.png" width="500">
 
 [Пример реализации](https://github.com/kremogen/moretech-MobileMap/blob/main/ds/tag_collection.json)
-
-#### Кластеризация
-
-Кластеризация может помочь разделять отзывы на группы в зависимости от уровня удовлетворенности клиентов. Это может
-помочь банку быстро выявить общие проблемы и радости клиентов.
-Выделение ключевых слов: Анализ ключевых слов может помочь выявить, какие конкретные аспекты обслуживания вызывают
-положительные или отрицательные эмоции.
 
 #### Поиск точек
 
