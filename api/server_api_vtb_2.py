@@ -10,7 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from config import offices
+lat_r = 0.0775
+lon_r = 0.055
 
 app = FastAPI()
 origins = [
@@ -42,7 +43,7 @@ def get_connection():
 async def process_data(data: RequestData):
     index = 1
     res = await get_atm_locations(data.latitude, data.longitude, index)
-    while len(res) == 0:
+    while len(res) < 1:
         if index > 100:
             return []
         
@@ -53,15 +54,18 @@ async def process_data(data: RequestData):
 
 
 async def get_atm_locations(latitude, longitude, index: int):
-    lat_20 = 0.31722522007226484 * index
-    lon_20 = 0.22583381380662185 * index
+    lat_dt = lat_r * index
+    lon_dt = lon_r * index
     
     connection = get_connection()
     cursor = connection.cursor()
     query = """SELECT * FROM `atm_data` WHERE latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?;"""
-    cursor.execute(query,
-                   (latitude - lat_20, latitude + lat_20, longitude - lon_20, longitude + lon_20))
-    rows = cursor.fetchall()
+    output_obj = cursor.execute(query, (latitude - lat_dt, latitude + lat_dt, longitude - lon_dt, longitude + lon_dt))
+    rows = []
+    
+    for row in cursor.fetchall():
+        rows.append({output_obj.description[i][0]: row[i] for i in range(len(row))})
+    
     cursor.close()
     connection.close()
     
@@ -70,27 +74,15 @@ async def get_atm_locations(latitude, longitude, index: int):
 
 @app.post("/get_office_location")
 async def process_data(data: RequestData):
-    latitude_people = data.latitude
-    longitude_people = data.longitude
-    
-    points_nearby = []
-    len_points_nearby = []
-    
-    for office in offices:
-        ans = haversine(latitude_people, longitude_people, office['latitude'], office['longitude'])
+    index = 1
+    points_nearby = await get_office_locations(data.latitude, data.longitude, index)
+    while len(points_nearby) < 1:
+        if index > 100:
+            return []
         
-        office['lenth'] = ans
-        if len(points_nearby) == 5:
-            max_value = max(len_points_nearby)
-            index = len_points_nearby.index(max_value)
-            
-            len_points_nearby[index] = ans
-            points_nearby[index] = office
-        else:
-            points_nearby.append(office)
-            len_points_nearby.append(ans)
+        index += 1
+        points_nearby = await get_office_locations(data.latitude, data.longitude, index)
     
-    ans = []
     for point in points_nearby:
         point['loadingQueue'] = {}
         
@@ -107,20 +99,27 @@ async def process_data(data: RequestData):
         else:
             st = "red"
         point['loadingQueue'] = [(cel + ost) * 10, st]
-        
-        min_len = float('inf')
-        max_len = 0
-        
-        for point in points_nearby:
-            min_len = min(min_len, point['lenth'])
-            max_len = max(max_len, point['lenth'])
-        midele = int((min_len + max_len)) // 2
-        
-        for point in points_nearby:
-            if midele > point['lenth']:
-                ans.append(point)
     
-    return ans
+    return points_nearby
+
+
+async def get_office_locations(latitude, longitude, index: int):
+    lat_dt = lat_r * index
+    lon_dt = lon_r * index
+    
+    connection = get_connection()
+    cursor = connection.cursor()
+    query = """SELECT * FROM `office_data` WHERE latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?;"""
+    output_obj = cursor.execute(query, (latitude - lat_dt, latitude + lat_dt, longitude - lon_dt, longitude + lon_dt))
+    rows = []
+    
+    for row in cursor.fetchall():
+        rows.append({output_obj.description[i][0]: row[i] for i in range(len(row))})
+    
+    cursor.close()
+    connection.close()
+    
+    return rows
 
 
 @app.get("/get_q_code")
