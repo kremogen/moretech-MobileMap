@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -119,6 +120,11 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
         mapView = findViewById(R.id.mapview)
         dialog = DialogModel(this)
         val map = mapView.mapWindow.map
+        val circularButton: ImageButton = findViewById(R.id.circularButton)
+        circularButton.setOnClickListener {
+            val POSITION = CameraPosition(Point(latitude, longitude), 13f, 150f, 30f)
+            map.move(POSITION)
+        }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationProviderClient.lastLocation.addOnSuccessListener {
             latitude = it.latitude
@@ -134,7 +140,7 @@ class Activity : AppCompatActivity(), UserLocationObjectListener,
                 val apiService = MyApiService()
                 launch(Dispatchers.IO) {
                     // Запускаем сетевой запрос в фоновом потоке
-                    val atmItems = apiService.getAtmData()
+                    val atmItems = apiService.getAtmData(latitude, longitude)
                     runOnUiThread {
                         atmItems.forEach { atmItem ->
                             val point = Point(atmItem.latitude, atmItem.longitude)

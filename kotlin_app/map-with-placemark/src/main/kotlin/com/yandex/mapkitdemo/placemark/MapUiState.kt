@@ -12,16 +12,13 @@ data class AtmItem(
     val address: String,
     val latitude: Double,
     val longitude: Double,
-    val allDay: Boolean
+    val allDay: Int
 )
 
 data class OfficeItem(
     val salePointName: String,
     val address: String,
-    val status: String,
-    val openHours: List<OpenHours>,
     val rko: String,
-    val openHoursIndividual: List<OpenHours>,
     val officeType: String,
     val salePointFormat: String,
     val suoAvailability: String,
@@ -29,9 +26,8 @@ data class OfficeItem(
     val latitude: Double,
     val longitude: Double,
     val metroStation: String,
-    val distance: Int,
-    val kep: Boolean,
-    val myBranch: Boolean
+    val distance: String,
+    val kep: String
 )
 
 data class OpenHours(

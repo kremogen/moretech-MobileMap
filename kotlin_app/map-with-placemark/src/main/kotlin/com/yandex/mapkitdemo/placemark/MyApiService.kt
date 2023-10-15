@@ -11,24 +11,31 @@ class MyApiService {
     private val link = "http://192.168.1.4:8000"
     private val client = OkHttpClient()
 
-    suspend fun getAtmData(): List<AtmItem> {
-        val url = link + "/get_atm" // Замените на ваш URL
+    suspend fun getAtmData(latitude: Double, longitude: Double): List<AtmItem> {
+        val url = link + "/get_atm_location"
+
+        val jsonBody = JSONObject().apply {
+            put("latitude", latitude)
+            put("longitude", longitude)
+        }
+
+        val requestBody =
+            RequestBody.create(MediaType.parse("application/json"), jsonBody.toString())
 
         val request = Request.Builder()
             .url(url)
+            .post(requestBody)
             .build()
 
         return suspendCoroutine { continuation ->
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    // Обработка ошибки при сетевом запросе
                     continuation.resumeWith(Result.failure(e))
                 }
 
                 override fun onResponse(call: Call, response: Response) {
                     response.use {
                         if (!response.isSuccessful) {
-                            // Обработка ошибки при получении ответа
                             val errorMessage = "Response unsuccessful: ${response.code()}"
                             continuation.resumeWith(Result.failure(IOException(errorMessage)))
                         } else {
@@ -157,7 +164,7 @@ class MyApiService {
                 val address = jsonObject.getString("address")
                 val latitude = jsonObject.getDouble("latitude")
                 val longitude = jsonObject.getDouble("longitude")
-                val allDay = jsonObject.getBoolean("allDay")
+                val allDay = jsonObject.getInt("all_day")
 
                 atmItems.add(AtmItem(address, latitude, longitude, allDay))
             }
@@ -177,7 +184,6 @@ class MyApiService {
                 val jsonObject = jsonArray.getJSONObject(i)
                 val salePointName = jsonObject.getString("salePointName")
                 val address = jsonObject.getString("address")
-                val status = jsonObject.getString("status")
                 val rko = jsonObject.getString("rko")
                 val officeType = jsonObject.getString("officeType")
                 val salePointFormat = jsonObject.getString("salePointFormat")
@@ -186,20 +192,14 @@ class MyApiService {
                 val latitude = jsonObject.getDouble("latitude")
                 val longitude = jsonObject.getDouble("longitude")
                 val metroStation = jsonObject.getString("metroStation")
-                val distance = jsonObject.getInt("distance")
-                val kep = jsonObject.getBoolean("kep")
-                val myBranch = jsonObject.getBoolean("myBranch")
+                val distance = jsonObject.getString("distance")
+                val kep = jsonObject.getString("kep")
 
-                val openHoursArray = jsonObject.getJSONArray("openHours")
-                val openHours = parseOpenHours(openHoursArray)
-
-                val openHoursIndividualArray = jsonObject.getJSONArray("openHoursIndividual")
-                val openHoursIndividual = parseOpenHours(openHoursIndividualArray)
 
                 val officeItem = OfficeItem(
-                    salePointName, address, status, openHours, rko, openHoursIndividual,
+                    salePointName, address, rko,
                     officeType, salePointFormat, suoAvailability, hasRamp, latitude, longitude,
-                    metroStation, distance, kep, myBranch
+                    metroStation, distance, kep,
                 )
 
                 officeItems.add(officeItem)
