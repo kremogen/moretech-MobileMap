@@ -10,8 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-lat_r = 0.0775
-lon_r = 0.055
+lat_r = 0.01585
+lon_r = 0.01125
 
 app = FastAPI()
 origins = [
